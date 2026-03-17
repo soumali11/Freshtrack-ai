@@ -1,0 +1,21 @@
+# Ignore temp OCR images
+
+backend/temp_*
+*.jpg
+*.png
+*.jpeg
+*.webp
+
+# Python cache
+
+**pycache**/
+*.pyc
+
+# Uploads (future safe)
+
+backend/uploads/
+
+# Environment
+
+.env
+venv/
