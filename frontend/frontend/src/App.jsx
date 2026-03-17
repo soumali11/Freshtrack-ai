@@ -92,23 +92,20 @@ const handleUpload = async () => {
     formData.append("file", file);
 
     try {
-      // Using 127.0.0.1 and a timestamp prevents most "Failed to Fetch" and caching errors
+      // ✅ Use 127.0.0.1 for maximum stability
       const response = await fetch("http://127.0.0.1:8000/api/upload", {
-  method: "POST",
-  body: formData,
-});
-      if (!response.ok) throw new Error(`Server responded with status: ${response.status}`);
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Server error");
       
       const data = await response.json();
-      
       if (data.expiry_date) {
         setResult({ expiry_date: data.expiry_date });
-      } else {
-        alert("OCR Error: No date found in response.");
       }
     } catch (error) {
-      console.error("Detailed Fetch Error:", error);
-      alert("Connection Failed. Check if uvicorn is running and your main.py is saved.");
+      alert("CONNECTION FAILED: Check your Python terminal for errors!");
     } finally {
       setLoading(false);
     }

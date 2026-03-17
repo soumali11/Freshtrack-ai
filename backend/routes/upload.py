@@ -1,39 +1,33 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import os
-# Import your OCR service - make sure this file exists!
-from backend.services.ocr_service import extract_expiry_date 
+import shutil
+# ✅ This matches the function name in your ocr_service.py
+from backend.services.ocr_service import extract_text, extract_expiry 
 
 router = APIRouter()
 
 @router.post("/upload")
 async def upload_image(file: UploadFile = File(...)):
-    # 1. Ensure uploads folder exists
-    upload_dir = "uploads"
-    if not os.path.exists(upload_dir):
-        os.makedirs(upload_dir)
-
-    file_path = os.path.join(upload_dir, file.filename)
+    os.makedirs("uploads", exist_ok=True)
+    file_path = os.path.join("uploads", file.filename)
     
     try:
-        # 2. Save the uploaded file
-        content = await file.read()
-        with open(file_path, "wb") as f:
-            f.write(content)
+        # Save the uploaded file
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
 
-        # 3. CALL REAL AI (No more hardcoded dates!)
-        # This will now attempt to read "03/10/24" from your milk bottle
-        detected_date = extract_expiry_date(file_path)
+        # ✅ 1. Get raw text from image
+        raw_text = extract_text(file_path)
         
-        if not detected_date:
-            return {"expiry_date": None, "error": "No date detected"}
-
-        return {"expiry_date": detected_date}
+        # ✅ 2. Extract date from that text
+        detected_date = extract_expiry(raw_text)
+        
+        return {"expiry_date": detected_date if detected_date else "Not Detected"}
 
     except Exception as e:
-        print(f"Backend Error: {e}")
+        print(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     
     finally:
-        # Clean up the file after processing to save space
         if os.path.exists(file_path):
             os.remove(file_path)

@@ -1,11 +1,11 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import upload # Ensure this path matches your folder!
+from backend.routes import upload 
 
 app = FastAPI()
 
-# THIS IS CRITICAL: It tells the backend to trust your React app
+# Enable CORS so your React frontend can connect
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
@@ -14,6 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include the upload routes
 app.include_router(upload.router, prefix="/api")
 
 @app.get("/")
