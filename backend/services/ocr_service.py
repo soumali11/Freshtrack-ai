@@ -1,4 +1,4 @@
-# Prarabdha Sachan
+
 
 import easyocr
 import re

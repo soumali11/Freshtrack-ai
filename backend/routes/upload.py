@@ -1,40 +1,39 @@
-# Prarabdha Sachan
-
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, HTTPException
 import os
-from backend.services.ocr_service import extract_text, extract_expiry
+# Import your OCR service - make sure this file exists!
+from backend.services.ocr_service import extract_expiry_date 
 
 router = APIRouter()
 
-UPLOAD_DIR = "backend/uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
 @router.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_image(file: UploadFile = File(...)):
+    # 1. Ensure uploads folder exists
+    upload_dir = "uploads"
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir)
+
+    file_path = os.path.join(upload_dir, file.filename)
+    
     try:
-        file_path = os.path.join(UPLOAD_DIR, f"temp_{file.filename}")
+        # 2. Save the uploaded file
+        content = await file.read()
+        with open(file_path, "wb") as f:
+            f.write(content)
 
-        # save file
-        with open(file_path, "wb") as buffer:
-            content = await file.read()
-            buffer.write(content)
+        # 3. CALL REAL AI (No more hardcoded dates!)
+        # This will now attempt to read "03/10/24" from your milk bottle
+        detected_date = extract_expiry_date(file_path)
+        
+        if not detected_date:
+            return {"expiry_date": None, "error": "No date detected"}
 
-        print("📁 FILE SAVED:", file_path)
-
-        # OCR
-        text = extract_text(file_path)
-        print("🧠 OCR TEXT:", text if text else "EMPTY")
-
-        # expiry extraction
-        expiry = extract_expiry(text)
-        print("📅 EXPIRY:", expiry)
-
-        return {
-            "filename": file.filename,
-            "extracted_text": text,
-            "expiry_date": expiry
-        }
+        return {"expiry_date": detected_date}
 
     except Exception as e:
-        print("❌ ERROR:", e)
-        return {"error": str(e)}
+        print(f"Backend Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+    finally:
+        # Clean up the file after processing to save space
+        if os.path.exists(file_path):
+            os.remove(file_path)

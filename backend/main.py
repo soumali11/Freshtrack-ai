@@ -1,23 +1,21 @@
-# Prarabdha Sachan
-
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.routes import upload
+from routes import upload # Ensure this path matches your folder!
 
 app = FastAPI()
 
-# ✅ CORS (VERY IMPORTANT)
+# THIS IS CRITICAL: It tells the backend to trust your React app
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# routes
-app.include_router(upload.router)
+app.include_router(upload.router, prefix="/api")
 
 @app.get("/")
-def home():
-    return {"message": "FreshTrack AI Backend Running"}
+async def root():
+    return {"message": "Backend is LIVE"}
