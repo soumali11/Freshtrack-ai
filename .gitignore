@@ -1,21 +1,20 @@
-# Ignore temp OCR images
-
-backend/temp_*
+# Images
 *.jpg
 *.png
 *.jpeg
 *.webp
 
-# Python cache
-
-**pycache**/
-*.pyc
-
-# Uploads (future safe)
-
+# Temp OCR
+backend/temp_*
 backend/uploads/
 
-# Environment
+# Python
+__pycache__/
+*.pyc
 
+# Node
+node_modules/
+
+# Env
 .env
 venv/

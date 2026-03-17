@@ -1,13 +1,22 @@
-#soumali(FreshTrack AI Backend)
+# Prarabdha Sachan
 
 from fastapi import FastAPI
-from backend.routes import upload, inventory
+from fastapi.middleware.cors import CORSMiddleware
+from backend.routes import upload
 
 app = FastAPI()
 
-# include routes
+# ✅ CORS (VERY IMPORTANT)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# routes
 app.include_router(upload.router)
-app.include_router(inventory.router)
 
 @app.get("/")
 def home():
