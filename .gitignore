@@ -1,20 +1,24 @@
-# Images
-*.jpg
-*.png
-*.jpeg
-*.webp
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Temp OCR
-backend/temp_*
-backend/uploads/
+node_modules
+dist
+dist-ssr
+*.local
 
-# Python
-__pycache__/
-*.pyc
-
-# Node
-node_modules/
-
-# Env
-.env
-venv/
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
